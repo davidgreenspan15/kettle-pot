@@ -106,61 +106,12 @@ export interface SearchRequest {
   p07: boolean; //false
 }
 
-const rez = {
-  r01: 'ffe772dc-d814-4297-8328-fd12a44cd390',
-  r02: '0',
-  r03: 'c0z0kv0zs2dvkwvyuxryhdke', // cookie
-  r04: '999',
-  r05: [],
-  r06: [
-    {
-      r01: '52ac6325-c55a-4454-95b6-9b0d728ec548',
-      r02: -1.0,
-      r03: 460755,
-      r04: 50445,
-      r05: 304,
-      r06: 17703,
-      r07: 24268,
-      r08: 22.0,
-      r09: 35.0,
-      r10: 304,
-      r11: 4,
-      r12: 460755,
-      r13: 50428,
-      r14: 4,
-      r15: '2021-07-08T06:40:00',
-      r16: 'Darlington Golf Course (10th Tee)',
-      r17: '2021-07-08T00:00:00',
-      r18: 24,
-      r19: null,
-      r20: '304',
-      r21: 22.0,
-      r22: null,
-      r23: null,
-      r24: '6:40 AM',
-      r25: '22.0000',
-      r26: '22.0000',
-      r27: '',
-      r28: '5,6,9',
-      r29: null,
-      r30: '­$',
-      r31: '',
-    },
-  ],
-};
-
-const req = {
-  p02: [
-    {
-      r01: 17703, //r06
-      r02: 304, //r05
-      r03: 50428, //r13
-      r04: 460755, //r03
-      r05: 460755, //r03
-      r06: -1, //r02 (fixed(0)?)
-      r07: '304', //r20
-    },
-  ],
-  p01: '52ac6325-c55a-4454-95b6-9b0d728ec548', //r01
-  p03: '0', // in root r02
-};
+export interface SearchForm {
+  userId: string;
+  courses: number[]; // courses
+  date: string; // date format(MM/DD/YYY)
+  startTime: string; // start time formaat("H:MM S")
+  endTime: string; // end time formaat("H:MM S")
+  min: number; // min players 0
+  max: number; // max players up to 4
+}
