@@ -1,9 +1,11 @@
 import axios, { AxiosResponse } from 'axios';
 import { ReserveRequest } from './reservation';
 import { SearchRequest } from '../types/search';
+import { updateTicketSearchFailed } from '../models/tickets';
+
 export const username = process.env.USERNAME;
 export const password = process.env.PASSWORD;
-export const add = async (body: AddRequest, cookies: string) => {
+export const add = async (body: AddRequest, cookies: string, id: number) => {
   try {
     const promise = await axios({
       headers: {
@@ -17,7 +19,7 @@ export const add = async (body: AddRequest, cookies: string) => {
     });
     return promise;
   } catch (err) {
-    console.log(err);
+    updateTicketSearchFailed(id, err, 'add Request');
   }
 };
 

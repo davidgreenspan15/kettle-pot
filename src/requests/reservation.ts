@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { ReservationRequest } from '../types/reserve';
+import { updateTicketSearchFailed } from '../models/tickets';
+
 export const reservation = async (
   body: ReservationRequest,
-  cookies: string
+  cookies: string,
+  id: number
 ) => {
   try {
     const promise = await axios({
@@ -16,13 +19,13 @@ export const reservation = async (
     });
     return promise;
   } catch (err) {
-    console.log(err);
+    updateTicketSearchFailed(id, err, 'reservation Request');
   }
 };
 
 export const createReserveOBJ: (r: any) => ReserveRequest = (response: any) => {
   let d = response.data;
-  let match = response.data.r06[0];
+  let match = d.data.r06[0];
   let body: ReservationRequest = {
     p02: [
       {

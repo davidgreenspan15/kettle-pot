@@ -1,7 +1,7 @@
 import express from 'express';
 import { search, createSearchOBJ } from './requests/search';
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Ticket } from '@prisma/client';
 import { getUserByEmail, getUserById, createUser } from './models/user';
 import { createTicket, getAllTickets, getTickets } from './models/tickets';
 import {
@@ -16,6 +16,7 @@ import { SearchRequest } from './types/search';
 import { createAddObj } from './requests/add';
 import { getAllItems } from './requests/getAllItems';
 import { createHoldReZObj, holdReservation } from './requests/holdReservation';
+import { updateTicketSearchFailed } from './models/tickets';
 const prisma = new PrismaClient();
 const app = express();
 const PORT = 8000;
@@ -32,76 +33,109 @@ export const username = process.env.USERNAME;
 export const password = process.env.PASSWORD;
 // SEARCH REQUEST
 app.get('/search', async (req, res) => {
-  let tickets = [];
+  let tickets: Ticket[] = [];
   try {
     tickets = await getAllTickets();
     console.log(tickets, 'got tickets');
-    const searchObj = createSearchOBJ(tickets[0]);
-    try {
-      console.log(searchObj, 'starting search with this object');
-      let searchResp = await search(searchObj);
-      let reserveObj = createReserveOBJ(searchResp);
+    tickets.forEach(async ticket => {
+      const id = ticket.id;
+      const searchObj = createSearchOBJ(ticket);
       try {
-        console.log(reserveObj, 'starting reserve Reserve Object');
-        let reserved = await reservation(reserveObj.body, reserveObj.cookies);
-        try {
-          console.log(
-            { data: reserved?.data.r02[0].r06, cookies: reserveObj.cookies },
-            'starting login  with these'
-          );
-          let loggedIn = await login(
-            reserved?.data.r02[0].r06,
-            reserveObj.cookies
-          );
-
+        console.log(searchObj, 'starting search with this object');
+        let searchResp = await search(searchObj, id);
+        if (searchResp?.data.r06.length > 0) {
+          let reserveObj = createReserveOBJ(searchResp);
           try {
-            let addOBj = createAddObj(
-              reserveObj,
-              loggedIn,
-              reserved,
-              searchObj
+            console.log(reserveObj, 'starting reserve Reserve Object');
+            let reserved = await reservation(
+              reserveObj.body,
+              reserveObj.cookies,
+              id
             );
-            console.log(addOBj, 'logging in with add obj');
-            const { addRequest, allCookies } = addOBj;
-            let added = await add(addRequest, allCookies);
             try {
-              let allItems = await getAllItems(addOBj.allCookies);
-              const holdRezObj = createHoldReZObj(
-                allItems?.data.CartItems[0].SponsorID,
-                loggedIn?.data,
-                reserved?.data.r02[0].r06
+              console.log(
+                {
+                  data: reserved?.data.r02[0].r06,
+                  cookies: reserveObj.cookies,
+                },
+                'starting login  with these'
               );
+              let loggedIn = await login(
+                reserved?.data.r02[0].r06,
+                reserveObj.cookies,
+                id
+              );
+
               try {
-                console.log(holdRezObj, 'holding reservation with holdrezobj');
-                const holdResponse = await holdReservation(
-                  holdRezObj,
-                  allCookies
+                let addOBj = createAddObj(
+                  reserveObj,
+                  loggedIn,
+                  reserved,
+                  searchObj
                 );
-                res.json({
-                  holdRezObj,
-                  data: holdResponse?.data,
-                  header: holdResponse?.headers,
-                });
+                console.log(addOBj, 'logging in with add obj');
+                const { addRequest, allCookies } = addOBj;
+                let added = await add(addRequest, allCookies, id);
+                try {
+                  let allItems = await getAllItems(addOBj.allCookies, id);
+                  const holdRezObj = createHoldReZObj(
+                    allItems?.data.CartItems[0].SponsorID,
+                    loggedIn?.data,
+                    reserved?.data.r02[0].r06
+                  );
+                  try {
+                    console.log(
+                      holdRezObj,
+                      'holding reservation with holdrezobj'
+                    );
+                    const holdResponse = await holdReservation(
+                      holdRezObj,
+                      allCookies,
+                      id
+                    );
+                    // res.json({
+                    //   holdRezObj,
+                    //   data: holdResponse?.data,
+                    //   header: holdResponse?.headers,
+                    // });
+                    // up to here
+                  } catch (err) {
+                    updateTicketSearchFailed(
+                      id,
+                      err,
+                      'Start HoldReservation Request On Index'
+                    );
+                  }
+                } catch (err) {
+                  updateTicketSearchFailed(
+                    id,
+                    err,
+                    'Start GetAllItems Request on Index'
+                  );
+                }
               } catch (err) {
-                console.log(err);
+                updateTicketSearchFailed(id, err, 'Start Add Request On Index');
               }
             } catch (err) {
-              console.log(err);
+              updateTicketSearchFailed(id, err, 'Start Login Request On Index');
             }
           } catch (err) {
-            console.log(err);
+            updateTicketSearchFailed(
+              id,
+              err,
+              'Start Reservation Request On Index'
+            );
           }
-        } catch (err) {
-          console.log(err);
         }
       } catch (err) {
-        console.log(err);
+        updateTicketSearchFailed(id, err, 'Start Search Request On Index ');
       }
-    } catch (err) {
-      console.log(err);
-    }
+      res.json({
+        tickets,
+      });
+    });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: `failed to get Tickets ${err}` });
   }
   // finally {
   //   try {

@@ -40,6 +40,22 @@ export const createTicket = async (body: SearchForm) => {
   return ticket;
 };
 
+export const updateTicketSearchFailed = async (
+  id: number,
+  err: any,
+  message: string
+) => {
+  await prisma.ticket.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: 'failed',
+      comment: `Failed at ${message} with Error ${JSON.stringify(err)}`,
+    },
+  });
+};
+
 interface SearchForm {
   userId: string;
   courses: number[];

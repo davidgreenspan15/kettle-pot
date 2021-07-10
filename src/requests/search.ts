@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { SearchRequest, SearchForm } from '../types/search';
 import moment from 'moment';
+import { updateTicketSearchFailed } from '../models/tickets';
 
-export const search = async (body: SearchRequest) => {
+export const search = async (body: SearchRequest, id: number) => {
   try {
     const promise = await axios({
       headers: {
@@ -14,7 +15,7 @@ export const search = async (body: SearchRequest) => {
     });
     return promise;
   } catch (err) {
-    console.log(err);
+    updateTicketSearchFailed(id, err, 'search Request');
   }
 };
 

@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { SearchRequest, SearchForm } from '../types/search';
-import moment from 'moment';
+
+import { updateTicketSearchFailed } from '../models/tickets';
 
 export const username = process.env.USERNAME;
 export const password = process.env.PASSWORD;
-export const login = async (sponsorID: number, cookies: string) => {
+export const login = async (sponsorID: number, cookies: string, id: number) => {
   try {
     const promise = await axios({
       headers: {
@@ -23,6 +23,6 @@ export const login = async (sponsorID: number, cookies: string) => {
     });
     return promise;
   } catch (err) {
-    console.log(err);
+    updateTicketSearchFailed(id, err, 'login Request');
   }
 };

@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { updateTicketSearchFailed } from '../models/tickets';
 
 export const holdReservation = async (
   body: HoldReservationRequest,
-  cookies: string
+  cookies: string,
+  id: number
 ) => {
   try {
     const promise = await axios({
@@ -16,7 +18,7 @@ export const holdReservation = async (
     });
     return promise;
   } catch (err) {
-    console.log(err);
+    updateTicketSearchFailed(id, err, 'holdReservation Request');
   }
 };
 
