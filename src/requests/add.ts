@@ -37,8 +37,8 @@ export const createAllCookies = (
 
 export const createAddObj = (
   reserveObj: ReserveRequest,
-  loggedIn: AxiosResponse<any> | undefined,
-  reserved: AxiosResponse<any> | undefined,
+  loggedIn: any,
+  reserved: any,
   searchObj: SearchRequest
 ) => {
   const allCookies = createAllCookies(

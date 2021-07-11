@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { SearchRequest, SearchForm } from '../types/search';
 import moment from 'moment';
+
 import { updateTicketSearchFailed } from '../models/tickets';
+import { SearchForm, SearchRequest } from '../types/search';
 
 export const search = async (body: SearchRequest, id: number) => {
   try {
@@ -13,8 +14,10 @@ export const search = async (body: SearchRequest, id: number) => {
       url: 'https://bergencountyrba.ezlinksgolf.com/api/search/search',
       data: body,
     });
+
     return promise;
   } catch (err) {
+    console.log(err, 'failed here');
     updateTicketSearchFailed(id, err, 'search Request');
   }
 };

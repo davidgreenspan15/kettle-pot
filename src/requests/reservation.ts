@@ -25,7 +25,7 @@ export const reservation = async (
 
 export const createReserveOBJ: (r: any) => ReserveRequest = (response: any) => {
   let d = response.data;
-  let match = d.data.r06[0];
+  let match = d.r06[0];
   let body: ReservationRequest = {
     p02: [
       {

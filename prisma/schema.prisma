@@ -22,10 +22,10 @@ model User {
 }
 
 model Ticket {
-  id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id])
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
   userId    String
-  status    String    @default("searching")
+  status    String   @default("searching")
   comment   String?
   courses   Int[]
   date      String
@@ -33,18 +33,32 @@ model Ticket {
   endTime   String
   min       Int
   max       Int
-  p07       Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  response  Response?
+  p07       Boolean  @default(false)
+  createdAt DateTime @default(now())
+  search    Search[]
+  attempt   Int      @default(0)
 
   @@map(name: "tickets")
 }
 
-model Response {
-  id        Int      @id @default(autoincrement())
-  ticket    Ticket   @relation(fields: [ticketId], references: [id])
-  ticketId  Int // relation scalar field (used in the `@relatio
-  createdAt DateTime @default(now())
+model Search {
+  id                      Int    @id @default(autoincrement())
+  ticket                  Ticket @relation(fields: [ticketId], references: [id])
+  ticketId                Int
+  searchRequest           Json?
+  searchResponse          Json?
+  reservationRequest      Json?
+  reservationResponse     Json?
+  loginRequest            Json?
+  loginResponse           Json?
+  addRequest              Json?
+  addResponse             Json?
+  getAllItemsRequest      Json?
+  getAllItemsResponse     Json?
+  holdReservationRequest  Json?
+  holdReservationResponse Json?
 
-  @@map(name: "responses")
+
+
+  @@map(name: "searches")
 }
