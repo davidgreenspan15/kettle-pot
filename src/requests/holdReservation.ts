@@ -27,7 +27,7 @@ export interface HoldReservationRequest {
   SponsorID: string; // getAllItems response cart[0].SponsorID to string
   ContactID: number; // loggedIn?.data.ContactID,
   SessionID: string; //loggedIn?.data.SessionID
-  MasterSponsorID: string; // from loggin req MasterSponsorID
+  MasterSponsorID: number; // from loggin req MasterSponsorID
 }
 
 export const createHoldReZObj = (

@@ -7,7 +7,11 @@ export const getTickets = async (uuid: string) => {
       userId: uuid,
     },
     include: {
-      search: true,
+      searches: {
+        include: {
+          response: true,
+        },
+      },
     },
   });
   return tickets;
@@ -16,7 +20,11 @@ export const getTickets = async (uuid: string) => {
 export const getAllTickets = async () => {
   const tickets = await prisma.ticket.findMany({
     include: {
-      search: true,
+      searches: {
+        include: {
+          response: true,
+        },
+      },
     },
   });
   return tickets;
@@ -51,7 +59,7 @@ export const updateTicketSearchFailed = async (
     },
     data: {
       status: 'failed',
-      comment: `Failed at ${message} with Error ${JSON.stringify(err)}`,
+      comment: `Failed at ${message} with Error ${err}`,
     },
   });
 };
@@ -63,6 +71,16 @@ export const updateTicketAttempts = async (id: number, count: number) => {
     },
     data: {
       attempt: count + 1,
+    },
+  });
+};
+export const updateTicketComplete = async (id: number) => {
+  await prisma.ticket.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: 'complete',
     },
   });
 };

@@ -30,10 +30,10 @@ export const password = process.env.PASSWORD;
 // task.start();
 app.get('/search', async (req, res) => {
   try {
-    let tickets = await Promise.resolve(handleSearch());
+    let response = await Promise.resolve(handleSearch());
 
     res.json({
-      tickets,
+      response,
     });
   } catch (err) {
     res.status(500).json({ message: 'Error Running search' });

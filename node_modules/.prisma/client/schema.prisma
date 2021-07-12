@@ -35,30 +35,58 @@ model Ticket {
   max       Int
   p07       Boolean  @default(false)
   createdAt DateTime @default(now())
-  search    Search[]
+  searches  Search[]
   attempt   Int      @default(0)
 
   @@map(name: "tickets")
 }
 
 model Search {
-  id                      Int    @id @default(autoincrement())
-  ticket                  Ticket @relation(fields: [ticketId], references: [id])
-  ticketId                Int
-  searchRequest           Json?
-  searchResponse          Json?
-  reservationRequest      Json?
-  reservationResponse     Json?
-  loginRequest            Json?
-  loginResponse           Json?
-  addRequest              Json?
-  addResponse             Json?
-  getAllItemsRequest      Json?
-  getAllItemsResponse     Json?
-  holdReservationRequest  Json?
-  holdReservationResponse Json?
+  id        Int       @id @default(autoincrement())
+  ticket    Ticket    @relation(fields: [ticketId], references: [id])
+  ticketId  Int
+  comments  String?
+  status    String?
+  response  Response?
+  createdAt DateTime  @default(now())
+
 
 
 
   @@map(name: "searches")
+}
+
+model Response {
+  id                           Int      @id @default(autoincrement())
+  ReservationName              String
+  Location                     String
+  ScheduledTime                String
+  NumberOfPlayers              Int
+  ReservationFee               String
+  TotalPrice                   String
+  CancellationDeadline         String
+  ConfirmationNumber           String
+  IsSuccessful                 Boolean
+  StatusText                   String
+  SponsorName                  String
+  CourseName                   String
+  City                         String
+  State                        String
+  Country                      String
+  OrderID                      String
+  Tax                          String
+  SKU                          String
+  ProductName                  String
+  UnitPrice                    String
+  Quantity                     Int
+  CaptainTeeTimeConflicts      Boolean?
+  CaptainTeeTimeConflictsFound Boolean
+  CaptainTeeTimeConflictMode   Int
+  PartnerTeeTimeConflicts      Boolean?
+  PartnerTeeTimeConflictsFound Boolean
+  PartnerTeeTimeConflictMode   Int
+  searches                     Search   @relation(fields: [searchId], references: [id])
+  searchId                     Int
+
+  @@map(name: "responses")
 }

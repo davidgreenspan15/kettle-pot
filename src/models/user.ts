@@ -18,7 +18,15 @@ export const getUserById = async (id: string) => {
       id: id,
     },
     include: {
-      tickets: true,
+      tickets: {
+        include: {
+          searches: {
+            include: {
+              response: true,
+            },
+          },
+        },
+      },
     },
   });
   return user;
