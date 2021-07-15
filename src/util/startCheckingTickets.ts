@@ -11,7 +11,11 @@ import {
   updateTicketAttempts,
   updateTicketSearchFailed,
 } from '../models/tickets';
-import { createSearch, updateSearchesStatus } from '../models/searches';
+import {
+  createSearch,
+  updateSearchesStatus,
+  updateSearchesStatusEmpty,
+} from '../models/searches';
 import {
   createTeeTimeConflictObj,
   teeTimeConflict,
@@ -236,7 +240,7 @@ const startSearch = async (t: Ticket) => {
         const finishedRez = await finish(finishObj, addObj.allCookies, id);
         finishResponseData = finishedRez?.data;
         await updateTicketComplete(id);
-        await updateSearchesStatus(searchTicket.id, '', 'Completed!');
+        await updateSearchesStatus(searchTicket.id, '', 'Completed');
         console.log(finishedRez?.data, 'responnse data');
         await createResponse(searchTicket.id, finishResponseData);
       } catch (err) {
@@ -252,6 +256,12 @@ const startSearch = async (t: Ticket) => {
           'Start Finish Booking Request On Index'
         );
       }
+    } else {
+      await updateSearchesStatusEmpty(
+        id,
+        'Failed Search',
+        'No Tee Times Available'
+      );
     }
   }
   return finishResponseData;

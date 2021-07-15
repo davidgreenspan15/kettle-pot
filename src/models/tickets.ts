@@ -11,7 +11,13 @@ export const getTickets = async (uuid: string) => {
         include: {
           response: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       },
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
   return tickets;
@@ -25,6 +31,9 @@ export const getAllTickets = async () => {
           response: true,
         },
       },
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
   return tickets;
@@ -40,12 +49,18 @@ export const getTicketByID = async (id: number) => {
 };
 
 export const createTicket = async (body: SearchForm) => {
-  const ticket = await prisma.ticket.create({
-    data: {
-      ...body,
-    },
-  });
-  return ticket;
+  try {
+    const ticket = await prisma.ticket.create({
+      data: {
+        ...body,
+      },
+    });
+    console.log(ticket);
+
+    return ticket;
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const updateTicketSearchFailed = async (
@@ -58,7 +73,7 @@ export const updateTicketSearchFailed = async (
       id: id,
     },
     data: {
-      status: 'failed',
+      status: 'Failed',
       comment: `Failed at ${message} with Error ${err}`,
     },
   });
@@ -83,6 +98,18 @@ export const updateTicketComplete = async (id: number) => {
       status: 'complete',
     },
   });
+};
+export const cancelTicket = async (id: number) => {
+  const ticket = await prisma.ticket.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: 'cancelled',
+      comment: 'Cancelled Search Request',
+    },
+  });
+  return ticket;
 };
 
 interface SearchForm {

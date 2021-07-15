@@ -10,6 +10,7 @@ export const getUserByEmail = async (email: string) => {
       tickets: true,
     },
   });
+  console.log(user);
   return user;
 };
 export const getUserById = async (id: string) => {

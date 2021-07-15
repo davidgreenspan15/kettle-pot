@@ -27,3 +27,19 @@ export const updateSearchesStatus = async (
     },
   });
 };
+
+export const updateSearchesStatusEmpty = async (
+  id: number,
+  status: string,
+  comment: string
+) => {
+  await prisma.search.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: status,
+      comments: comment,
+    },
+  });
+};
