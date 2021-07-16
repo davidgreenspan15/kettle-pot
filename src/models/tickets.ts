@@ -18,6 +18,7 @@ export const getTickets = async (uuid: string) => {
 };
 
 export const getAllTickets = async () => {
+  console.log('getting all tickets');
   const tickets = await prisma.ticket.findMany({
     include: {
       searches: {
