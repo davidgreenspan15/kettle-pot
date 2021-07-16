@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "prisma generate",
+    "dev": "PORT=8000 ts-node ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "nodemon src/index.ts"
+    "serve": "nodemon src/index.ts",
+    "start": "ts-node ./src/index.ts"
   },
   "keywords": [],
   "author": "",
