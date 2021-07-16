@@ -6,7 +6,7 @@ import { createUser, getUserByEmail, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
