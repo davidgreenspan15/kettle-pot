@@ -1,12 +1,7 @@
 import { Ticket } from '@prisma/client';
 import express from 'express';
 
-import {
-  createTicket,
-  getAllTickets,
-  getTickets,
-  cancelTicket,
-} from './models/tickets';
+import { createTicket, getAllTickets, getTickets } from './models/tickets';
 import { createUser, getUserByEmail, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
@@ -57,7 +52,6 @@ app.post('/users', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   let user = await getUserByEmail(req.body.email);
-  console.log(req.body, 'user');
   if (!user || (user && req.body.name !== user.name)) {
     res.status(502).json({ message: 'Invalid Credentials' });
   } else {
@@ -72,17 +66,9 @@ app.post('/autoLogin', async (req, res) => {
     res.status(200).json(user);
   }
 });
-app.post('/tickets/create', async (req, res) => {
+app.post('/tickets', async (req, res) => {
   try {
     let ticket = await createTicket(req.body);
-    res.status(200).json(ticket);
-  } catch (err) {
-    res.status(500).json({ message: err });
-  }
-});
-app.post('/tickets/:id/cancel', async (req, res) => {
-  try {
-    let ticket = await cancelTicket(parseInt(req.params.id));
     res.status(200).json(ticket);
   } catch (err) {
     res.status(500).json({ message: err });
