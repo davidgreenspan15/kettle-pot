@@ -264,6 +264,7 @@ const startSearch = async (t: Ticket) => {
       );
     }
   }
+
   return finishResponseData;
 };
 
