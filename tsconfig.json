@@ -6,11 +6,16 @@
   "node_modules"  /* exclude everything in  node_modules */
 ],
   "compilerOptions": {
-    "target": "es6",
+     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "lib": ["ES2018"],
     "module": "commonjs",
-    "rootDir": "./",
-    "outDir": "./build",
-    "esModuleInterop": true,
-    "strict": true
+    "target": "es6",
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist"
   }
 }
