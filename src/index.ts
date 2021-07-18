@@ -5,21 +5,23 @@ import { createTicket, getAllTickets, getTickets } from './models/tickets';
 import { createUser, getUserByEmail, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
+import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 8000;
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+// app.use(function (req, res, next) {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', '*');
+//   // Request methods you wish to allow
+//   res.setHeader('Access-Control-Allow-Methods', '*');
 
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', '*');
+//   // Request headers you wish to allow
+//   res.setHeader('Access-Control-Allow-Headers', '*');
 
-  // res.setHeader('Access-Control-Allow-Credentials', 'false');
+//   // res.setHeader('Access-Control-Allow-Credentials', 'false');
 
-  next();
-});
+//   next();
+// });
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 export const username = process.env.USERNAME;
