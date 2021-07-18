@@ -8,7 +8,7 @@ import cron from 'node-cron';
 const app = express();
 const PORT = process.env.PORT || 8000;
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8888');
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
   // Request methods you wish to allow
   res.setHeader(
