@@ -252,6 +252,12 @@ const startSearch = async (t: Ticket) => {
           'Start Finish Booking Request On Index'
         );
       }
+    } else {
+      await updateSearchesStatus(
+        searchTicket.id,
+        'No Tee Times Available',
+        'Failed Search Process'
+      );
     }
   }
 
