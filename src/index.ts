@@ -5,23 +5,27 @@ import { createTicket, getAllTickets, getTickets } from './models/tickets';
 import { createUser, getUserByEmail, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
-import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 8000;
-// app.use(function (req, res, next) {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
-//   // Request methods you wish to allow
-//   res.setHeader('Access-Control-Allow-Methods', '*');
+  // Request methods you wish to allow
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+  );
 
-//   // Request headers you wish to allow
-//   res.setHeader('Access-Control-Allow-Headers', '*');
+  // Request headers you wish to allow
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With,Content-Type'
+  );
 
-//   // res.setHeader('Access-Control-Allow-Credentials', 'false');
+  // res.setHeader('Access-Control-Allow-Credentials', 'false');
 
-//   next();
-// });
-app.use(cors());
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 export const username = process.env.USERNAME;
@@ -46,9 +50,6 @@ app.get('/search', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Error Running search' });
   }
-});
-app.get('/', (req, res) => {
-  res.json('You Maade IT');
 });
 
 app.post('/users', async (req, res) => {
