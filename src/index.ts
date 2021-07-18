@@ -47,6 +47,9 @@ app.get('/search', async (req, res) => {
     res.status(500).json({ message: 'Error Running search' });
   }
 });
+app.get('/', (req, res) => {
+  res.json('You Maade IT');
+});
 
 app.post('/users', async (req, res) => {
   let user = await getUserByEmail(req.body.email);
