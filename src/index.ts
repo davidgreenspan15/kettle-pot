@@ -93,7 +93,7 @@ app.post('/tickets', async (req, res) => {
 });
 app.post('/tickets/:id/cancel', async (req, res) => {
   try {
-    let ticket = await cancelTicket(req.body);
+    let ticket = await cancelTicket(parseInt(req.params.id));
     res.status(200).json(ticket);
   } catch (err) {
     res.status(500).json({ message: err });
