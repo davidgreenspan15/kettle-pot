@@ -1,7 +1,12 @@
 import { Ticket } from '@prisma/client';
 import express from 'express';
 
-import { createTicket, getAllTickets, getTickets } from './models/tickets';
+import {
+  createTicket,
+  getAllTickets,
+  getTickets,
+  cancelTicket,
+} from './models/tickets';
 import { createUser, getUserByEmail, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
@@ -81,6 +86,14 @@ app.post('/autoLogin', async (req, res) => {
 app.post('/tickets', async (req, res) => {
   try {
     let ticket = await createTicket(req.body);
+    res.status(200).json(ticket);
+  } catch (err) {
+    res.status(500).json({ message: err });
+  }
+});
+app.post('/tickets/:id/cancel', async (req, res) => {
+  try {
+    let ticket = await cancelTicket(req.body);
     res.status(200).json(ticket);
   } catch (err) {
     res.status(500).json({ message: err });

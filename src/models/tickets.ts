@@ -86,6 +86,18 @@ export const updateTicketComplete = async (id: number) => {
   });
 };
 
+export const cancelTicket = async (id: number) => {
+  await prisma.ticket.update({
+    where: {
+      id: id,
+    },
+    data: {
+      comment: 'Cancelled Ticket Request',
+      status: 'cancelled',
+    },
+  });
+};
+
 interface SearchForm {
   userId: string;
   courses: number[];
