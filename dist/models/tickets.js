@@ -29,6 +29,7 @@ const getTickets = (uuid) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getTickets = getTickets;
 const getAllTickets = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('getting all tickets');
     const tickets = yield prisma.ticket.findMany({
         include: {
             searches: {
