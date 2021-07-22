@@ -14,7 +14,6 @@ import bcrypt from 'bcrypt';
 import { AES, enc } from 'crypto-ts';
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
-const algorithm = 'aes-192-cbc';
 const password = process.env.SECRET_KEY;
 const app = express();
 
