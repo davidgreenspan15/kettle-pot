@@ -63,7 +63,6 @@ app.get('/search', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   let user = await getUserByUsername(req.body.username);
-  console.log({ saltRounds, password });
   if (user) {
     res.status(502).json({ message: 'Email Already Exists' });
   } else if (!user) {
