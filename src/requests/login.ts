@@ -2,9 +2,13 @@ import axios from 'axios';
 
 import { updateTicketSearchFailed } from '../models/tickets';
 
-export const username = process.env.USERNAME;
-export const password = process.env.PASSWORD;
-export const login = async (sponsorID: number, cookies: string, id: number) => {
+export const login = async (
+  sponsorID: number,
+  cookies: string,
+  id: number,
+  golferUsername: string,
+  golferPassword: string
+) => {
   try {
     const promise = await axios({
       headers: {
@@ -15,9 +19,9 @@ export const login = async (sponsorID: number, cookies: string, id: number) => {
       method: 'post',
       url: 'https://bergencountyrba.ezlinksgolf.com/api/login/login',
       data: {
-        Login: username,
+        Login: golferUsername,
         MasterSponsorID: `${sponsorID}`,
-        Password: password,
+        Password: golferPassword,
         SessionID: '',
       },
     });

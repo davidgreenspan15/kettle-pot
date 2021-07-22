@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTicketComplete = exports.updateTicketAttempts = exports.updateTicketSearchFailed = exports.createTicket = exports.getTicketByID = exports.getAllTickets = exports.getTickets = void 0;
+exports.cancelTicket = exports.updateTicketComplete = exports.updateTicketAttempts = exports.updateTicketSearchFailed = exports.createTicket = exports.getTicketByID = exports.getAllTickets = exports.getTickets = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getTickets = (uuid) => __awaiter(void 0, void 0, void 0, function* () {
@@ -92,4 +92,17 @@ const updateTicketComplete = (id) => __awaiter(void 0, void 0, void 0, function*
     });
 });
 exports.updateTicketComplete = updateTicketComplete;
+const cancelTicket = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const ticket = yield prisma.ticket.update({
+        where: {
+            id: id,
+        },
+        data: {
+            comment: 'Cancelled Ticket Request',
+            status: 'cancelled',
+        },
+    });
+    return ticket;
+});
+exports.cancelTicket = cancelTicket;
 //# sourceMappingURL=tickets.js.map

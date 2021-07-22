@@ -1,4 +1,4 @@
-import { Ticket, Search, Prisma } from '@prisma/client';
+import { Ticket, Search, Prisma, User } from '@prisma/client';
 import { createAddObj, add } from '../requests/add';
 import { createSearchOBJ, search } from '../requests/search';
 import { reservation, createReserveOBJ } from '../requests/reservation';
@@ -18,6 +18,10 @@ import {
 } from '../requests/teeTimeConflict';
 import { createResponse } from '../models/responses';
 import { createFinishObj, finish } from '../requests/finish';
+import { getUserById } from '../models/user';
+import { AES, enc } from 'crypto-ts';
+const password = process.env.SECRET_KEY;
+
 const startSearch = async (t: Ticket) => {
   const id = t.id;
   let searchTicket: Search | null = null;
@@ -39,8 +43,14 @@ const startSearch = async (t: Ticket) => {
   let ttConflictResponseHeaders: any;
   let finishObj: any;
   let finishResponseData: any;
+  let user: User;
   try {
     await updateTicketAttempts(id, t.attempt);
+  } catch (err) {
+    console.log(err);
+  }
+  try {
+    user = await getUserById(t.userId);
   } catch (err) {
     console.log(err);
   }
@@ -103,10 +113,14 @@ const startSearch = async (t: Ticket) => {
           },
           'starting login  with these'
         );
+        var bytes = AES.decrypt(user.golferPassword.toString(), password);
+        var plaintext = bytes.toString(enc.Utf8);
         let loggedIn = await login(
           reserveResponseData.r02[0].r06,
           reserveObj.cookies,
-          id
+          id,
+          user.golferUsername,
+          plaintext
         );
         loginResponseData = loggedIn?.data;
         loginResponseHeaders = loggedIn?.headers;

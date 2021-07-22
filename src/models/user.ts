@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-export const getUserByEmail = async (email: string) => {
+export const getUserByUsername = async (username: string) => {
   const user = await prisma.user.findUnique({
     where: {
-      email: email,
+      username: username,
     },
     include: {
       tickets: true,
@@ -31,11 +31,18 @@ export const getUserById = async (id: string) => {
   });
   return user;
 };
-export const createUser = async (name: string, email: string) => {
+export const createUser = async (
+  username: string,
+  password: string,
+  golferUsername: string,
+  golferPassword: string
+) => {
   const user = await prisma.user.create({
     data: {
-      email: email,
-      name: name,
+      username: username,
+      password: password,
+      golferUsername: golferUsername,
+      golferPassword: golferPassword,
     },
     include: {
       tickets: true,

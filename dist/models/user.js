@@ -9,13 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUser = exports.getUserById = exports.getUserByEmail = void 0;
+exports.createUser = exports.getUserById = exports.getUserByUsername = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserByUsername = (username) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield prisma.user.findUnique({
         where: {
-            email: email,
+            username: username,
         },
         include: {
             tickets: true,
@@ -23,7 +23,7 @@ const getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* ()
     });
     return user;
 });
-exports.getUserByEmail = getUserByEmail;
+exports.getUserByUsername = getUserByUsername;
 const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield prisma.user.findUnique({
         where: {
@@ -44,11 +44,13 @@ const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return user;
 });
 exports.getUserById = getUserById;
-const createUser = (name, email) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = (username, password, golferUsername, golferPassword) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield prisma.user.create({
         data: {
-            email: email,
-            name: name,
+            username: username,
+            password: password,
+            golferUsername: golferUsername,
+            golferPassword: golferPassword,
         },
         include: {
             tickets: true,

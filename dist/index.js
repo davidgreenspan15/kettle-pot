@@ -12,28 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.password = exports.username = void 0;
 const express_1 = __importDefault(require("express"));
 const tickets_1 = require("./models/tickets");
 const user_1 = require("./models/user");
 const startCheckingTickets_1 = require("./util/startCheckingTickets");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const crypto_1 = __importDefault(require("crypto"));
+const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
+const algorithm = 'aes-192-cbc';
+const password = process.env.SECRET_KEY;
 const app = express_1.default();
+const handleEncrptGolfPassword = () => {
+    crypto_1.default.scrypt(password, 'salt', 24, (err, key) => {
+        if (err)
+            throw err;
+        // Then, we'll generate a random initialization vector
+        crypto_1.default.randomFill(new Uint8Array(16), (err, iv) => {
+            if (err)
+                throw err;
+            const cipher = crypto_1.default.createCipheriv(algorithm, key, iv);
+            let encrypted = cipher.update('some clear text data', 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            return encrypted;
+        });
+    });
+};
 const PORT = process.env.PORT || 8000;
 app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type');
+    // res.setHeader('Access-Control-Allow-Credentials', 'false');
     next();
 });
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-exports.username = process.env.USERNAME;
-exports.password = process.env.PASSWORD;
 // SEARCH REQUEST
 // let task = cron.schedule('*/2 * * * *', async () => {
 //   try {
@@ -55,22 +70,47 @@ app.get('/search', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 }));
 app.post('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let user = yield user_1.getUserByEmail(req.body.email);
+    let user = yield user_1.getUserByUsername(req.body.username);
     if (user) {
         res.status(502).json({ message: 'Email Already Exists' });
     }
     else if (!user) {
-        user = yield user_1.createUser(req.body.name, req.body.email);
-        res.status(200).json(user);
+        bcrypt_1.default.hash(req.body.password, saltRounds, function (err, hash) {
+            if (err) {
+                res.status(500).json({ message: 'Error hashing password' });
+            }
+            else {
+                crypto_1.default.scrypt(password, 'salt', 24, (err, key) => {
+                    if (err)
+                        throw err;
+                    // Then, we'll generate a random initialization vector
+                    crypto_1.default.randomFill(new Uint8Array(16), (err, iv) => __awaiter(this, void 0, void 0, function* () {
+                        if (err)
+                            throw err;
+                        const cipher = crypto_1.default.createCipheriv(algorithm, key, iv);
+                        let encrypted = cipher.update(req.body.golferPassword, 'utf8', 'hex');
+                        encrypted += cipher.final('hex');
+                        user = yield user_1.createUser(req.body.username, hash, req.body.golferUsername, encrypted);
+                        res.status(200).json(user);
+                    }));
+                });
+            }
+        });
     }
 }));
 app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let user = yield user_1.getUserByEmail(req.body.email);
-    if (!user || (user && req.body.name !== user.name)) {
-        res.status(502).json({ message: 'Invalid Credentials' });
+    let user = yield user_1.getUserByUsername(req.body.username);
+    if (user) {
+        const match = yield bcrypt_1.default.compare(req.body.password, user.password);
+        if (match) {
+            res.status(200).json(user);
+        }
+        else {
+            res.status(502).json({ message: 'Invalid Credentials' });
+        }
     }
     else {
-        res.status(200).json(user);
+        res.status(502).json({ message: 'Invalid Credentials' });
     }
 }));
 app.post('/autoLogin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -79,12 +119,29 @@ app.post('/autoLogin', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(502).json({ message: 'No Users Found' });
     }
     else {
-        res.status(200).json(user);
+        const key = crypto_1.default.scryptSync(password, 'salt', 24);
+        // The IV is usually passed along with the ciphertext.
+        const iv = Buffer.alloc(16, 0); // Initialization vector.
+        console.log(iv);
+        const decipher = crypto_1.default.createDecipheriv(algorithm, key, iv);
+        // Encrypted using same algorithm, key and iv.
+        let decrypted = decipher.update(user.golferPassword, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        res.status(200).json({ user, decrypted });
     }
 }));
 app.post('/tickets', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let ticket = yield tickets_1.createTicket(req.body);
+        res.status(200).json(ticket);
+    }
+    catch (err) {
+        res.status(500).json({ message: err });
+    }
+}));
+app.post('/tickets/:id/cancel', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let ticket = yield tickets_1.cancelTicket(parseInt(req.params.id));
         res.status(200).json(ticket);
     }
     catch (err) {

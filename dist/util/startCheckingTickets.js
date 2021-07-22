@@ -163,6 +163,9 @@ const startSearch = (t) => __awaiter(void 0, void 0, void 0, function* () {
                 yield tickets_2.updateTicketSearchFailed(id, err, 'Start Finish Booking Request On Index');
             }
         }
+        else {
+            yield searches_1.updateSearchesStatus(searchTicket.id, 'No Tee Times Available', 'Failed Search Process');
+        }
     }
     return finishResponseData;
 });

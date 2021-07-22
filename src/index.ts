@@ -7,10 +7,17 @@ import {
   getTickets,
   cancelTicket,
 } from './models/tickets';
-import { createUser, getUserByEmail, getUserById } from './models/user';
+import { createUser, getUserByUsername, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
+import bcrypt from 'bcrypt';
+import { AES, enc } from 'crypto-ts';
+
+const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
+const algorithm = 'aes-192-cbc';
+const password = process.env.SECRET_KEY;
 const app = express();
+
 const PORT = process.env.PORT || 8000;
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -33,8 +40,6 @@ app.use(function (req, res, next) {
 });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-export const username = process.env.USERNAME;
-export const password = process.env.PASSWORD;
 // SEARCH REQUEST
 
 // let task = cron.schedule('*/2 * * * *', async () => {
@@ -58,21 +63,40 @@ app.get('/search', async (req, res) => {
 });
 
 app.post('/users', async (req, res) => {
-  let user = await getUserByEmail(req.body.email);
+  let user = await getUserByUsername(req.body.username);
+
   if (user) {
     res.status(502).json({ message: 'Email Already Exists' });
   } else if (!user) {
-    user = await createUser(req.body.name, req.body.email);
-    res.status(200).json(user);
+    bcrypt.hash(req.body.password, saltRounds, async function (err, hash) {
+      if (err) {
+        res.status(500).json({ message: 'Error hashing password' });
+      } else {
+        var ciphertext = AES.encrypt(req.body.golferPassword, password);
+
+        user = await createUser(
+          req.body.username,
+          hash,
+          req.body.golferUsername,
+          ciphertext.toString()
+        );
+        res.status(200).json(user);
+      }
+    });
   }
 });
 
 app.post('/login', async (req, res) => {
-  let user = await getUserByEmail(req.body.email);
-  if (!user || (user && req.body.name !== user.name)) {
-    res.status(502).json({ message: 'Invalid Credentials' });
+  let user = await getUserByUsername(req.body.username);
+  if (user) {
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (match) {
+      res.status(200).json(user);
+    } else {
+      res.status(502).json({ message: 'Invalid Credentials' });
+    }
   } else {
-    res.status(200).json(user);
+    res.status(502).json({ message: 'Invalid Credentials' });
   }
 });
 app.post('/autoLogin', async (req, res) => {
