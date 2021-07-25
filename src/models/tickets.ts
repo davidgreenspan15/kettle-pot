@@ -6,6 +6,9 @@ export const getTickets = async (uuid: string) => {
     where: {
       userId: uuid,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
     include: {
       searches: {
         include: {
@@ -20,6 +23,9 @@ export const getTickets = async (uuid: string) => {
 export const getAllTickets = async () => {
   console.log('getting all tickets');
   const tickets = await prisma.ticket.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
     include: {
       searches: {
         include: {

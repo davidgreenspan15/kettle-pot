@@ -19,6 +19,9 @@ export const getUserById = async (id: string) => {
     },
     include: {
       tickets: {
+        orderBy: {
+          createdAt: 'desc',
+        },
         include: {
           searches: {
             include: {
