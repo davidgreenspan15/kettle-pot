@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 8000;
 app.use(function (req, res, next) {
   res.setHeader(
     'Access-Control-Allow-Origin',
-    'http://tee-times-book.herokuapp.com'
+    'https://tee-times-book.herokuapp.com'
   );
 
   // Request methods you wish to allow
