@@ -42,6 +42,13 @@ export const getTicketByID = async (id: number) => {
     where: {
       id: id,
     },
+    include: {
+      searches: {
+        include: {
+          response: true,
+        },
+      },
+    },
   });
   return ticket;
 };
@@ -96,6 +103,13 @@ export const cancelTicket = async (id: number) => {
   const ticket = await prisma.ticket.update({
     where: {
       id: id,
+    },
+    include: {
+      searches: {
+        include: {
+          response: true,
+        },
+      },
     },
     data: {
       comment: 'Cancelled Ticket Request',
