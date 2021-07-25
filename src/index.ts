@@ -44,14 +44,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 // SEARCH REQUEST
 
-// let task = cron.schedule('*/2 * * * *', async () => {
-//   try {
-//     await handleSearch();
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-// task.start();
+let task = cron.schedule('*/27 * * * *', async () => {
+  try {
+    await handleSearch();
+  } catch (err) {
+    console.log(err);
+  }
+});
+task.start();
 app.get('/search', async (req, res) => {
   try {
     let response = await Promise.resolve(handleSearch());
