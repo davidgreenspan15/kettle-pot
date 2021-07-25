@@ -45,6 +45,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 // SEARCH REQUEST
 
 let task = cron.schedule('*/27 * * * *', async () => {
+  console.log(`Cron Search running at ${new Date(Date.now())}`);
   try {
     await handleSearch();
   } catch (err) {
