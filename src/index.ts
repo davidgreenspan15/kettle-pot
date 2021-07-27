@@ -11,7 +11,8 @@ import { createUser, getUserByUsername, getUserById } from './models/user';
 import { handleSearch } from './util/startCheckingTickets';
 import cron from 'node-cron';
 import bcrypt from 'bcrypt';
-import { AES, enc } from 'crypto-ts';
+import { AES } from 'crypto-ts';
+import { updateExpired } from './models/tickets';
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
 const password = process.env.SECRET_KEY;
@@ -43,9 +44,45 @@ app.use(function (req, res, next) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 // SEARCH REQUEST
+const compareDates = async (ticket: Ticket) => {
+  console.log('Starting date checker');
+  let todaysDate = new Date(Date.now());
+  let ticketDate = new Date(ticket.date);
+
+  if (ticketDate.getFullYear() < todaysDate.getFullYear()) {
+    await updateExpired(ticket.id);
+  }
+
+  if (
+    ticketDate.getFullYear() === todaysDate.getFullYear() &&
+    ticketDate.getMonth() < todaysDate.getMonth()
+  ) {
+    await updateExpired(ticket.id);
+  }
+  if (
+    ticketDate.getFullYear() === todaysDate.getFullYear() &&
+    ticketDate.getMonth() === todaysDate.getMonth() &&
+    ticketDate.getDate() < todaysDate.getDate()
+  ) {
+    await updateExpired(ticket.id);
+  }
+};
 
 let task = cron.schedule('*/27 * * * *', async () => {
   console.log(`Cron Search running at ${new Date(Date.now())}`);
+  let tickets: Ticket[] = [];
+
+  try {
+    tickets = await getAllTickets();
+  } catch (err) {
+    console.log(err);
+  }
+
+  tickets.forEach(async ticket => {
+    if (ticket.status === 'searching') {
+      compareDates(ticket);
+    }
+  });
   try {
     await handleSearch();
   } catch (err) {

@@ -99,6 +99,18 @@ export const updateTicketComplete = async (id: number) => {
   });
 };
 
+export const updateExpired = async (id: number) => {
+  await prisma.ticket.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: 'Expired',
+      comment: 'Date has already passed',
+    },
+  });
+};
+
 export const cancelTicket = async (id: number) => {
   const ticket = await prisma.ticket.update({
     where: {
