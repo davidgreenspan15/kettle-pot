@@ -11,6 +11,9 @@ export const getTickets = async (uuid: string) => {
     },
     include: {
       searches: {
+        orderBy: {
+          createdAt: 'desc',
+        },
         include: {
           response: true,
         },
@@ -28,6 +31,9 @@ export const getAllTickets = async () => {
     },
     include: {
       searches: {
+        orderBy: {
+          createdAt: 'desc',
+        },
         include: {
           response: true,
         },
@@ -44,6 +50,9 @@ export const getTicketByID = async (id: number) => {
     },
     include: {
       searches: {
+        orderBy: {
+          createdAt: 'desc',
+        },
         include: {
           response: true,
         },
