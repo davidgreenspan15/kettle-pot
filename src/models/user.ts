@@ -27,9 +27,6 @@ export const getUserById = async (id: string) => {
             include: {
               response: true,
             },
-            orderBy: {
-              createdAt: 'desc',
-            },
           },
         },
       },
