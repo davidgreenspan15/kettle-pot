@@ -20,6 +20,8 @@ import { createResponse } from '../models/responses';
 import { createFinishObj, finish } from '../requests/finish';
 import { getUserById } from '../models/user';
 import { AES, enc } from 'crypto-ts';
+import { initializeSenior } from '../requests/initializeSenior';
+import { init } from '../requests/init';
 const password = process.env.SECRET_KEY;
 
 const startSearch = async (t: Ticket) => {
@@ -46,6 +48,10 @@ const startSearch = async (t: Ticket) => {
   let user: User;
   let groupId: number;
   let sponsorId: number;
+  let initializeResponseData: any;
+  let initializeResponseHeaders: any;
+  let initResponseData: any;
+  let initResponseHeaders: any;
   try {
     await updateTicketAttempts(id, t.attempt);
   } catch (err) {
@@ -63,10 +69,46 @@ const startSearch = async (t: Ticket) => {
   }
   if (searchTicket) {
     try {
+      console.log('starting init');
+      let initResponse = await init();
+      initResponseData = initResponse?.data;
+      initResponseHeaders = initResponse?.headers;
+    } catch (err) {
+      console.log(err);
+      await updateSearchesStatus(searchTicket.id, err, 'Failed Init');
+      await updateTicketSearchFailed(id, err, 'Fail Init Request On Index ');
+    }
+    if (user.senior) {
+      try {
+        console.log(searchObj, 'starting senior setup');
+        let initializeResponse = await initializeSenior(
+          id,
+          initResponseHeaders
+        );
+        initializeResponseData = initializeResponse?.data;
+        initializeResponseHeaders = initializeResponse?.headers;
+      } catch (err) {
+        console.log(err);
+        await updateSearchesStatus(
+          searchTicket.id,
+          err,
+          'Failed Senior Sertup'
+        );
+        await updateTicketSearchFailed(id, err, 'Fail Senior Setup On Index ');
+      }
+    }
+
+    try {
       console.log(searchObj, 'starting search with this object');
-      let searchResp = await search(searchObj, id);
-      searchResponseData = searchResp?.data;
-      searchResponseHeaders = searchResp?.headers;
+      if (initializeResponseHeaders) {
+        let searchResp = await search(searchObj, id, initResponseHeaders);
+        searchResponseData = searchResp?.data;
+        searchResponseHeaders = searchResp?.headers;
+      } else {
+        let searchResp = await search(searchObj, id);
+        searchResponseData = searchResp?.data;
+        searchResponseHeaders = searchResp?.headers;
+      }
     } catch (err) {
       console.log(err);
       await updateSearchesStatus(searchTicket.id, err, 'Failed Search');
@@ -82,7 +124,7 @@ const startSearch = async (t: Ticket) => {
 
         reserveObj = createReserveOBJ({
           data: searchResponseData,
-          headers: searchResponseHeaders,
+          headers: initResponseHeaders,
           user: user,
         });
         console.log(reserveObj, 'starting reserve Reserve Object');

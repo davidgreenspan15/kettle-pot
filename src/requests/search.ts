@@ -4,12 +4,21 @@ import moment from 'moment';
 import { updateTicketSearchFailed } from '../models/tickets';
 import { SearchForm, SearchRequest } from '../types/search';
 
-export const search = async (body: SearchRequest, id: number) => {
+export const search = async (
+  body: SearchRequest,
+  id: number,
+  cookie?: string
+) => {
+  let headers = {
+    'Content-Type': 'application/json',
+  };
+  if (cookie) {
+    let cookies: string = cookie['set-cookie'][0].split(';')[0];
+    headers['Cookie'] = cookies;
+  }
   try {
     const promise = await axios({
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
       method: 'post',
       url: 'https://bergencountyrba.ezlinksgolf.com/api/search/search',
       data: body,
@@ -51,6 +60,7 @@ export const createSearchOBJ = (body: SearchForm) => {
     p06: body.max, // max players up to 4
     p07: false, //false
   };
+
   return obj;
 };
 
