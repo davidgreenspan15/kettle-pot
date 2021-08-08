@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { ReserveRequest } from './reservation';
 import { SearchRequest } from '../types/search';
 import { updateTicketSearchFailed } from '../models/tickets';
+import { User } from '@prisma/client';
 
 export const add = async (body: AddRequest, cookies: string, id: number) => {
   try {
@@ -37,7 +38,8 @@ export const createAddObj = (
   reserveObj: ReserveRequest,
   loggedIn: any,
   reserved: any,
-  searchObj: SearchRequest
+  searchObj: SearchRequest,
+  user: User
 ) => {
   const allCookies = createAllCookies(
     reserveObj.cookies,

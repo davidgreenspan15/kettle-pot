@@ -29,7 +29,7 @@ export const createReserveOBJ: (r: any) => ReserveRequest = (response: any) => {
   let body: ReservationRequest = {
     p02: [
       {
-        r01: match.r06, //r06
+        r01: response.user.senior ? 17704 : 17703, //r06
         r02: match.r05, //r05
         r03: match.r13, //r13
         r04: match.r03, //r03

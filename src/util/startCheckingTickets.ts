@@ -44,6 +44,8 @@ const startSearch = async (t: Ticket) => {
   let finishObj: any;
   let finishResponseData: any;
   let user: User;
+  let groupId: number;
+  let sponsorId: number;
   try {
     await updateTicketAttempts(id, t.attempt);
   } catch (err) {
@@ -81,6 +83,7 @@ const startSearch = async (t: Ticket) => {
         reserveObj = createReserveOBJ({
           data: searchResponseData,
           headers: searchResponseHeaders,
+          user: user,
         });
         console.log(reserveObj, 'starting reserve Reserve Object');
         let reserved = await reservation(
@@ -141,7 +144,8 @@ const startSearch = async (t: Ticket) => {
           reserveObj,
           { data: loginResponseData, headers: loginResponseHeaders },
           { data: reserveResponseData, headers: reserveResponseHeaders },
-          searchObj
+          searchObj,
+          user
         );
         console.log(addObj, 'logging in with add obj');
         const { addRequest, allCookies } = addObj;
