@@ -19,6 +19,7 @@ model User {
   tickets        Ticket[]
   createdAt      DateTime @default(now())
   isAdmin        Boolean  @default(false)
+  senior         Boolean  @default(false)
 
   @@map(name: "users")
 }

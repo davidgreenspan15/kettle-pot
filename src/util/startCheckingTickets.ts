@@ -242,10 +242,13 @@ const startSearch = async (t: Ticket) => {
       }
       try {
         await updateSearchesStatus(searchTicket.id, '', 'Start Finish Process');
+
+        let groupId = user.senior ? '26257' : '26256';
         finishObj = await createFinishObj(
           allItemsResponseData.CartItems[0],
           loginResponseData,
-          reserveResponseData.r02[0].r06
+          reserveResponseData.r02[0].r06,
+          groupId
         );
         const finishedRez = await finish(finishObj, addObj.allCookies, id);
         finishResponseData = finishedRez?.data;

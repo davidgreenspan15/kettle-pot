@@ -27,7 +27,8 @@ export const finish = async (
 export const createFinishObj = (
   cart: any,
   loggedIn: any,
-  masterSponsorID: number
+  masterSponsorID: number,
+  groupId: string
 ) => {
   return {
     SponsorID: `${cart.SponsorID}`, // getAllItems response cart[0].SponsorID to string
@@ -38,7 +39,7 @@ export const createFinishObj = (
     Email1: null,
     Email2: null,
     Email3: null,
-    GroupID: '26256', // '26256'
+    GroupID: groupId, // '26256'reg or '26257' sr
     MasterSponsorID: `${masterSponsorID}`,
     ReservationTypeID: `${cart.ReservationTypeI}`,
     SessionID: loggedIn.SessionID,
